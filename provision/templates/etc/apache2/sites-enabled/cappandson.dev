@@ -1,10 +1,10 @@
 <VirtualHost *:80>
 
-    DocumentRoot /var/www/ovensprite.dev
-    ServerName www.ovensprite.dev
-    ServerAlias ovensprite.dev
+    DocumentRoot /var/www/cappandson.dev
+    ServerName www.cappandson.dev
+    ServerAlias cappandson.dev
 
-    <Directory /var/www/ovensprite.dev>
+    <Directory /var/www/cappandson.dev>
         Options FollowSymLinks MultiViews
         AllowOverride All
         Order allow,deny

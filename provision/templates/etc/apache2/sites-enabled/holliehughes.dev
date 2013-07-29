@@ -1,10 +1,10 @@
 <VirtualHost *:80>
 
-    DocumentRoot /var/www/ovensprite.dev
-    ServerName www.ovensprite.dev
-    ServerAlias ovensprite.dev
+    DocumentRoot /var/www/holliehughes.dev
+    ServerName www.holliehughes.dev
+    ServerAlias holliehughes.dev
 
-    <Directory /var/www/ovensprite.dev>
+    <Directory /var/www/holliehughes.dev>
         Options FollowSymLinks MultiViews
         AllowOverride All
         Order allow,deny

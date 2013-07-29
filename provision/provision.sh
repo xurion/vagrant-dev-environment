@@ -79,12 +79,12 @@ if ! packageInstalled "apache2"; then
         rm /etc/apache2/sites-available/default-ssl
         rm -rf /var/www
         ln -s /home/vagrant/Sites /var/www
-        service apache2 restart
     fi
 fi
 
 #copy/recopy all the vhost files
 cp -f /vagrant/provision/templates/etc/apache2/sites-enabled/* /etc/apache2/sites-enabled
+service apache2 restart
 
 if ! packageInstalled "libapache2-mod-auth-mysql" && packageInstalled "apache2" && packageInstalled "mysql-server"; then
     apt-get -y install libapache2-mod-auth-mysql
