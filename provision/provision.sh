@@ -1,27 +1,24 @@
 #
 # Import VM settings and copy them to the guest
 #
-
 source /vagrant/provision/vm-settings.sh
 cp /vagrant/provision/vm-settings.sh /etc/vm-settings.sh
 
 #
 # Use non-interactive mode for package installation
 #
-
 export DEBIAN_FRONTEND=noninteractive
 
 #
 # Update & upgrade packages
 #
-
+echo ===== Updating packages =====
 apt-get -y update
 apt-get -y upgrade
 
 #
 # Create a shortcut function to help determine if a package is installed or not
 #
-
 function packageInstalled {
     if dpkg --get-selections "$1" 2>/dev/null | grep -qE '\<install$' > /dev/null; then
         return 0
@@ -33,24 +30,24 @@ function packageInstalled {
 #
 # Install Debconf utils
 #
-
 if ! packageInstalled "debconf-utils"; then
+    echo ===== Installing Debconf utils =====
     apt-get -y install debconf-utils
 fi
 
 #
 # Install cURL
 #
-
 if ! packageInstalled "curl"; then
+    echo ===== Installing cURL =====
     apt-get -y install curl
 fi
 
 #
 # Install and configure MySQL
 #
-
 if ! packageInstalled "mysql-server" && packageInstalled "debconf-utils"; then
+    echo ===== Installing MySQL =====
     echo "mysql-server-5.1 mysql-server/root_password password $vm_mysql_root_password" > /tmp/mysql.preseed
     echo "mysql-server-5.1 mysql-server/root_password_again password $vm_mysql_root_password" >> /tmp/mysql.preseed
     echo "mysql-server-5.1 mysql-server/start_on_boot boolean true" >> /tmp/mysql.preseed
@@ -65,8 +62,8 @@ fi
 #
 # Install and configure Apache & mods
 #
-
 if ! packageInstalled "apache2"; then
+    echo ===== Installing Apache =====
     apt-get -y install apache2
     if packageInstalled "apache2"; then
         echo "" >> /etc/apache2/apache2.conf
@@ -82,11 +79,15 @@ if ! packageInstalled "apache2"; then
     fi
 fi
 
-#copy/recopy all the vhost files
+#
+# copy/recopy all the vhost files
+#
+echo ===== Migrating vhost files =====
 cp -f /vagrant/provision/templates/etc/apache2/sites-enabled/* /etc/apache2/sites-enabled
 service apache2 restart
 
 if ! packageInstalled "libapache2-mod-auth-mysql" && packageInstalled "apache2" && packageInstalled "mysql-server"; then
+    echo ===== Installing apache module for MySQL authentication =====
     apt-get -y install libapache2-mod-auth-mysql
     if packageInstalled "libapache2-mod-auth-mysql"; then
         a2enmod auth_mysql
@@ -98,8 +99,8 @@ fi
 #
 # Install and configure PHP & extensions
 #
-
 if ! packageInstalled "php5" && packageInstalled "apache2"; then
+    echo ===== Installing PHP =====
     apt-get -y install php5
     if packageInstalled "php5"; then
         find / -name php.ini | xargs sed -i "s/;\s*date.timezone\s*=\s*/date.timezone = Europe\/London/g"
@@ -110,6 +111,7 @@ if ! packageInstalled "php5" && packageInstalled "apache2"; then
 fi
 
 if ! packageInstalled "php5-suhosin" && packageInstalled "php5"; then
+    echo ===== Installing Suhosin =====
     apt-get -y install php5-suhosin
     if packageInstalled "php5-suhosin"; then
         find / -name suhosin.ini | xargs sed -i "s/;\s*suhosin.executor.include.whitelist\s*=\s*/suhosin.executor.include.whitelist = phar/g"
@@ -117,9 +119,10 @@ if ! packageInstalled "php5-suhosin" && packageInstalled "php5"; then
 fi
 
 if ! packageInstalled "php-apc" && packageInstalled "php5"; then
+    echo ===== Installing PHP-APC =====
     apt-get -y install php-apc
     if packageInstalled "php-apc"; then
-        if [ -f "/usr/share/doc/php-apc/apc.php.gz" ]; then   
+        if [ -f "/usr/share/doc/php-apc/apc.php.gz" ]; then
             gunzip /usr/share/doc/php-apc/apc.php.gz
         fi
         sed -i "s/defaults[(]'USE_AUTHENTICATION',1[)];/defaults('USE_AUTHENTICATION',0);/g" /usr/share/doc/php-apc/apc.php
@@ -129,46 +132,57 @@ if ! packageInstalled "php-apc" && packageInstalled "php5"; then
 fi
 
 if ! packageInstalled "php5-curl" && packageInstalled "php5"; then
+    echo ===== Installing PHP-cURL =====
     apt-get -y install php5-curl
 fi
 
 if ! packageInstalled "php5-gd" && packageInstalled "php5"; then
+    echo ===== Installing PHP-GD =====
     apt-get -y install php5-gd
 fi
 
 if ! packageInstalled "php5-intl" && packageInstalled "php5"; then
+    echo ===== Installing PHP internationalization extension =====
     apt-get -y install php5-intl
 fi
 
 if ! packageInstalled "php5-mcrypt" && packageInstalled "php5"; then
+    echo ===== Installing mcrypt library =====
     apt-get -y install php5-mcrypt
 fi
 
 if ! packageInstalled "php5-mysqlnd" && packageInstalled "php5"; then
+    echo ===== Installing MySQL native driver =====
     apt-get -y install php5-mysqlnd
 fi
 
 if ! packageInstalled "php5-pspell" && packageInstalled "php5"; then
+    echo ===== Installing Pspell =====
     apt-get -y install php5-pspell
 fi
 
 if ! packageInstalled "libssh2-php" && packageInstalled "php5"; then
+    echo ===== Installing SSH2 =====
     apt-get -y install libssh2-php
 fi
 
 if ! packageInstalled "php5-sqlite" && packageInstalled "php5"; then
+    echo ===== Installing MySQL lite =====
     apt-get -y install php5-sqlite
 fi
 
 if ! packageInstalled "php5-xdebug" && packageInstalled "php5"; then
+    echo ===== Installing Xdebug =====
     apt-get -y install php5-xdebug
 fi
 
 if ! packageInstalled "php5-xsl" && packageInstalled "php5"; then
+    echo ===== Installing XSL extension =====
     apt-get -y install php5-xsl
 fi
 
 if ! packageInstalled "php-pear" && packageInstalled "php5"; then
+    echo ===== Installing Pear =====
     apt-get -y install php-pear
     if packageInstalled "php-pear"; then
         pear config-set auto_discover 1
@@ -191,24 +205,24 @@ fi
 #
 # Install ImageMagick
 #
-
 if ! packageInstalled "imagemagick"; then
+    echo ===== Installing imagemagick =====
     apt-get -y install imagemagick
 fi
 
 #
 # Install GraphViz
 #
-
 if ! packageInstalled "graphviz"; then
+    echo ===== Installing Graphviz =====
     apt-get -y install graphviz
 fi
 
 #
 # Install and configure SSMTP
 #
-
 if ! packageInstalled "ssmtp"; then
+    echo ===== Installing SSMTP =====
     apt-get -y install ssmtp
     if packageInstalled "ssmtp"; then
         rm /etc/ssmtp/ssmtp.conf
@@ -225,24 +239,26 @@ fi
 #
 # Install VCS packages
 #
-
 if ! packageInstalled "git"; then
+    echo ===== Installing GIT =====
     apt-get -y install git
 fi
 
 if ! packageInstalled "subversion"; then
+    echo ===== Installing SVN =====
     apt-get -y install subversion
 fi
 
 if ! packageInstalled "mercurial"; then
+    echo ===== Installing Mercurial =====
     apt-get -y install mercurial
 fi
 
 #
 # Install Composer
 #
-
 if [ ! -f "/usr/local/bin/composer" ] && packageInstalled "curl"; then
+    echo ===== Installing Composer =====
     cd
     curl -s https://getcomposer.org/installer | php
     if [ -f "composer.phar" ]; then
@@ -253,8 +269,8 @@ fi
 #
 # Install and configure phpMyAdmin
 #
-
 if [ ! -d "/usr/share/phpmyadmin" ] && packageInstalled "apache2" && packageInstalled "mysql-server"; then
+    echo ===== Installing phpMyAdmin =====
     cp /vagrant/provision/resources/phpMyAdmin-3.5.2.2-english.tar.gz /usr/share
     cd /usr/share/
     tar xf phpMyAdmin-3.5.2.2-english.tar.gz
