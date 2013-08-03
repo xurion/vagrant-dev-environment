@@ -72,6 +72,9 @@ if ! packageInstalled "apache2"; then
         echo "" >> /etc/apache2/apache2.conf
         echo "# Set Application Environment" >> /etc/apache2/apache2.conf
         echo "SetEnv ENVIRONMENT_TYPE development" >> /etc/apache2/apache2.conf
+        echo "" >> /etc/apache2/apache2.conf
+        echo "# Disable sendfile to prevent caching" >> /etc/apache2/apache2.conf
+        echo "EnableSendfile off" >> /etc/apache2/apache2.conf
         a2enmod rewrite
         rm /etc/apache2/sites-available/default-ssl
         rm -rf /var/www
