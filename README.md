@@ -15,7 +15,7 @@ Unpack or clone the files to your Sites directory. The path should be
 
 Navigate to this directory in Terminal and simply run 'vagrant up'
 
-In your hosts file (/etc/hosts) set your localhost to 33.33.33.10.
+In your hosts file (/etc/hosts) set your localhost to 192.168.50.4.
 
 This vagrant box will automatically set your Sites directory as localhost.
 
@@ -29,6 +29,6 @@ in:
 Any other vhost files you place here will be picked up next time you run vagrant
 provision.
 
-By default, the vagrant machine will be set on 33.33.33.10 on your network.
+By default, the vagrant machine will be set on 192.168.50.4 on your network.
 This allows you to assign your virtual hosts to that IP so you can run them on a
 customised domain name rather than having to develop everything on localhost.
