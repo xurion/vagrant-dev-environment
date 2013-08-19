@@ -2,7 +2,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.hostname = "lamp"
 
-  config.vm.network :private_network, ip: "33.33.33.10"
+  config.vm.network :private_network, ip: "192.168.50.4"
 
   # Our packaged basebox should be based of Ubuntu 12.04 32bit.
 
